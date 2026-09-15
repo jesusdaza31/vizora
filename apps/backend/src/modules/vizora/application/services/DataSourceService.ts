@@ -170,18 +170,16 @@ export class DataSourceService implements IDataSourceService {
         rowCountMap.set(`${rc.table_schema}.${rc.table_name}`, rc.row_count);
       }
 
-      // Get columns for these tables
-      const tableDTOs: TableDTO[] = [];
-      for (const t of tables) {
-        const columns = await this.fetchColumnsForTable(t.TABLE_SCHEMA, t.TABLE_NAME);
+      // Don't fetch columns in list view - only fetch when table is selected
+      const tableDTOs: TableDTO[] = tables.map((t) => {
         const key = `${t.TABLE_SCHEMA}.${t.TABLE_NAME}`;
-        tableDTOs.push({
+        return {
           tableSchema: t.TABLE_SCHEMA,
           tableName: t.TABLE_NAME,
-          columns,
+          columns: [], // Empty in list view - fetch on demand
           rowCountEstimate: rowCountMap.get(key) ?? 0,
-        });
-      }
+        };
+      });
 
       return { tables: tableDTOs, totalCount };
     } catch (e) {

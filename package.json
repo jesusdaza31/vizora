@@ -1,0 +1,29 @@
+{
+  "name": "vizora",
+  "private": true,
+  "scripts": {
+    "dev": "pnpm run /^dev:/",
+    "dev:backend": "pnpm --filter @vizora/backend dev",
+    "dev:frontend": "pnpm --filter @vizora/frontend dev",
+    "build": "NODE_ENV=production pnpm -r --filter @vizora/config --filter @vizora/database --filter @vizora/types build && NODE_ENV=production pnpm --filter @vizora/backend build && NODE_ENV=production pnpm --filter @vizora/frontend build",
+    "start:backend": "pnpm --filter @vizora/backend start",
+    "start:frontend": "pnpm --filter @vizora/frontend start",
+    "lint": "eslint . --ext .ts",
+    "format": "prettier --write \"**/*.ts\"",
+    "changeset": "changeset",
+    "version-packages": "changeset version",
+    "publish-packages": "changeset publish"
+  },
+  "devDependencies": {
+    "@changesets/cli": "2.31.1",
+    "@eslint/js": "9.0.0",
+    "eslint": "9.0.0",
+    "prettier": "3.4.0",
+    "typescript": "6.0.3",
+    "typescript-eslint": "8.0.0"
+  },
+  "engines": {
+    "node": ">=20.0.0",
+    "pnpm": ">=9.0.0"
+  }
+}

@@ -137,18 +137,15 @@ export class DataSourceService implements IDataSourceService {
       );
       const totalCount = countResult[0]?.total ?? 0;
 
-      // Get paginated tables using TOP and subquery for offset
+      // Get paginated tables using OFFSET/FETCH
       const tables = await queryRaw<RawTable>(
         `SELECT TABLE_SCHEMA, TABLE_NAME
-         FROM (
-           SELECT TOP (@limit) TABLE_SCHEMA, TABLE_NAME,
-             ROW_NUMBER() OVER (ORDER BY TABLE_NAME) AS RowNum
-           FROM INFORMATION_SCHEMA.TABLES
-           WHERE TABLE_TYPE = 'BASE TABLE'
-             AND TABLE_NAME LIKE @search
-         ) AS PagedTables
-         WHERE RowNum > @offset
-         ORDER BY TABLE_NAME`,
+         FROM INFORMATION_SCHEMA.TABLES
+         WHERE TABLE_TYPE = 'BASE TABLE'
+           AND TABLE_NAME LIKE @search
+         ORDER BY TABLE_NAME
+         OFFSET @offset ROWS
+         FETCH NEXT @limit ROWS ONLY`,
         { search: searchPattern, limit, offset },
       );
 

@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from 'next'
+import { Toaster } from 'sonner'
 import VizoraQueryProvider from './VizoraQueryProvider'
 
 export const metadata: Metadata = {
@@ -18,6 +19,7 @@ export default function VizoraLayout({
   return (
     <VizoraQueryProvider>
       {children}
+      <Toaster richColors position="bottom-right" />
     </VizoraQueryProvider>
   )
 }

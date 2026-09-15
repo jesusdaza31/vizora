@@ -19,6 +19,8 @@ import {
   ChevronRight,
   Palette,
 } from 'lucide-react';
+import { RelativeTime } from '@/components/vizora/ui/RelativeTime';
+import { ConfirmDialog } from '@/components/vizora/ui/ConfirmDialog';
 
 export function Toolbar() {
   const dashboard = useBuilderStore((s) => s.dashboard);
@@ -26,6 +28,7 @@ export function Toolbar() {
   const isDirty = useBuilderStore((s) => s.isDirty);
   const isSaving = useBuilderStore((s) => s.isSaving);
   const isPreview = useBuilderStore((s) => s.isPreview);
+  const lastSavedAt = useBuilderStore((s) => s.lastSavedAt);
   const undoStack = useBuilderStore((s) => s.undoStack);
   const redoStack = useBuilderStore((s) => s.redoStack);
   const save = useBuilderStore((s) => s.save);
@@ -40,6 +43,7 @@ export function Toolbar() {
   const [editingPageId, setEditingPageId] = useState<string | null>(null);
   const [editName, setEditName] = useState('');
   const [themeEditorOpen, setThemeEditorOpen] = useState(false);
+  const [deletePageConfirmId, setDeletePageConfirmId] = useState<string | null>(null);
   const tabsRef = useRef<HTMLDivElement>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(false);
@@ -82,11 +86,16 @@ export function Toolbar() {
         <span className="text-sm font-semibold text-foreground truncate max-w-[120px] sm:max-w-none">
           {dashboard?.name ?? 'Dashboard'}
         </span>
-        {isDirty && !isSaving && (
-          <span className="text-xs text-amber-600 font-medium">*</span>
-        )}
         {isSaving && (
           <span className="text-xs text-muted-foreground">Saving...</span>
+        )}
+        {!isSaving && isDirty && (
+          <span className="text-xs text-amber-600 font-medium">Unsaved changes</span>
+        )}
+        {!isSaving && !isDirty && lastSavedAt && (
+          <span className="text-xs text-muted-foreground">
+            Saved <RelativeTime date={lastSavedAt} />
+          </span>
         )}
       </div>
 
@@ -140,7 +149,7 @@ export function Toolbar() {
                     <Pencil className="h-2.5 w-2.5" />
                   </button>
                   <button
-                    onClick={() => removePage(page.id)}
+                    onClick={() => setDeletePageConfirmId(page.id)}
                     className="rounded p-0.5 hover:bg-destructive/10 hover:text-destructive"
                   >
                     <X className="h-2.5 w-2.5" />
@@ -220,6 +229,21 @@ export function Toolbar() {
       </div>
 
       <ThemeEditor open={themeEditorOpen} onClose={() => setThemeEditorOpen(false)} />
+
+      <ConfirmDialog
+        open={deletePageConfirmId !== null}
+        onOpenChange={(open) => !open && setDeletePageConfirmId(null)}
+        title="Delete page"
+        description={`Are you sure you want to delete "${pages.find((p) => p.id === deletePageConfirmId)?.name ?? 'this page'}"? This action cannot be undone.`}
+        confirmLabel="Delete"
+        destructive
+        onConfirm={() => {
+          if (deletePageConfirmId) {
+            removePage(deletePageConfirmId);
+          }
+          setDeletePageConfirmId(null);
+        }}
+      />
     </div>
   );
 }

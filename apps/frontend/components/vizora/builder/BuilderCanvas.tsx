@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useCallback, useMemo } from 'react';
+import React, { useCallback, useEffect, useMemo } from 'react';
 import { Responsive, useContainerWidth } from 'react-grid-layout';
 import type { Layout, ResponsiveLayouts } from 'react-grid-layout';
 import 'react-grid-layout/css/styles.css';
@@ -22,19 +22,7 @@ type BuilderCanvasProps = {
   errorMap?: Record<string, string | null>;
 };
 
-function WidgetErrorFallback() {
-  return (
-    <div className="flex h-full min-h-[120px] flex-col items-center justify-center gap-2 p-4">
-      <p className="text-xs text-destructive">Widget failed to render</p>
-      <button
-        onClick={() => window.location.reload()}
-        className="rounded-md border border-border px-2 py-1 text-xs text-muted-foreground hover:bg-accent"
-      >
-        Reload
-      </button>
-    </div>
-  );
-}
+
 
 export function BuilderCanvas({ theme, dataMap = {}, loadingMap = {}, errorMap = {} }: BuilderCanvasProps) {
   const dashboard = useBuilderStore((s) => s.dashboard);
@@ -42,6 +30,7 @@ export function BuilderCanvas({ theme, dataMap = {}, loadingMap = {}, errorMap =
   const selectedComponentId = useBuilderStore((s) => s.selectedComponentId);
   const selectComponent = useBuilderStore((s) => s.selectComponent);
   const updateComponent = useBuilderStore((s) => s.updateComponent);
+  const removeComponent = useBuilderStore((s) => s.removeComponent);
   const isPreview = useBuilderStore((s) => s.isPreview);
   const isLoading = useBuilderStore((s) => s.isLoading);
   const { width, containerRef, mounted } = useContainerWidth();
@@ -82,6 +71,28 @@ export function BuilderCanvas({ theme, dataMap = {}, loadingMap = {}, errorMap =
     },
     [components, updateComponent],
   );
+
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      const target = e.target as HTMLElement;
+      if (
+        target.tagName === 'INPUT' ||
+        target.tagName === 'TEXTAREA' ||
+        target.isContentEditable
+      ) return;
+      if (!selectedComponentId || isPreview) return;
+
+      if (e.key === 'Delete' || e.key === 'Backspace') {
+        e.preventDefault();
+        removeComponent(selectedComponentId);
+      } else if (e.key === 'Escape') {
+        e.preventDefault();
+        selectComponent(null);
+      }
+    };
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
+  }, [selectedComponentId, isPreview, removeComponent, selectComponent]);
 
   const handleSelect = useCallback(
     (e: React.MouseEvent, componentId: string) => {
@@ -151,7 +162,7 @@ export function BuilderCanvas({ theme, dataMap = {}, loadingMap = {}, errorMap =
                   </div>
                 )}
                 <div className={cn('p-2', !isPreview && 'h-[calc(100%-28px)]', isPreview && 'h-full')}>
-                  <ErrorBoundary fallback={<WidgetErrorFallback />}>
+                  <ErrorBoundary>
                     <WidgetRegistry
                       config={comp}
                       data={dataMap[comp.id] ?? null}

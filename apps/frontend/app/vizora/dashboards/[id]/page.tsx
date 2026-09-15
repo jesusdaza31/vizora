@@ -30,6 +30,16 @@ export default function DashboardEditorPage({
 }) {
   const { id } = React.use(params);
   const { dashboard, isLoading, error, loadDashboard } = useBuilderStore();
+  const isDirty = useBuilderStore((s) => s.isDirty);
+
+  React.useEffect(() => {
+    if (!isDirty) return;
+    const handler = (e: BeforeUnloadEvent) => {
+      e.preventDefault();
+    };
+    window.addEventListener('beforeunload', handler);
+    return () => window.removeEventListener('beforeunload', handler);
+  }, [isDirty]);
 
   React.useEffect(() => {
     let cancelled = false;

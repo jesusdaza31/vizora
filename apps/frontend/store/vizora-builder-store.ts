@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { toast } from 'sonner';
 import type { DashboardDTO, DashboardConfig, ComponentConfig, FilterConfig, FilterBinding, PageConfig, ThemeConfig } from '@/lib/vizora/types';
 import { updateDashboard } from '@/lib/vizora/dashboard-api';
 
@@ -13,6 +14,7 @@ type BuilderState = {
   isDirty: boolean;
   isSaving: boolean;
   isLoading: boolean;
+  lastSavedAt: string | null;
   isPreview: boolean;
   error: string | null;
   undoStack: DashboardConfig[];
@@ -61,6 +63,7 @@ export const useBuilderStore = create<BuilderState>((set, get) => ({
   isDirty: false,
   isSaving: false,
   isLoading: false,
+  lastSavedAt: null,
   isPreview: false,
   error: null,
   undoStack: [],
@@ -74,6 +77,7 @@ export const useBuilderStore = create<BuilderState>((set, get) => ({
       filterValues: {},
       isDirty: false,
       isLoading: false,
+      lastSavedAt: dashboard.updatedAt,
       error: null,
       undoStack: [],
       redoStack: [],
@@ -225,9 +229,11 @@ export const useBuilderStore = create<BuilderState>((set, get) => ({
         config: dashboard.config,
         version: dashboard.version,
       });
-      set({ dashboard: updated, isDirty: false, isSaving: false });
+      set({ dashboard: updated, isDirty: false, isSaving: false, lastSavedAt: new Date().toISOString() });
+      toast.success('Dashboard saved');
     } catch (err) {
       set({ error: err instanceof Error ? err.message : 'Save failed', isSaving: false });
+      toast.error('Failed to save dashboard');
     }
   },
 
@@ -240,6 +246,7 @@ export const useBuilderStore = create<BuilderState>((set, get) => ({
       isDirty: false,
       isSaving: false,
       isLoading: false,
+      lastSavedAt: null,
       error: null,
       undoStack: [],
       redoStack: [],

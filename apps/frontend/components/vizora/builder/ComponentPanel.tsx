@@ -77,7 +77,22 @@ export function ComponentPanel() {
   const handleApplyTemplate = (name: TemplateName) => {
     if (!dashboard || !activePageId) return;
     const template = applyTemplate(name);
+    
+    // Find existing table and columns from current components to inherit
+    const existingComponent = activePage.components.find(
+      (c) => c.dataSource?.table && c.dataSource.table.length > 0
+    );
+    const existingTable = existingComponent?.dataSource?.table ?? '';
+    const existingColumns = existingComponent?.dataSource?.columns ?? [];
+    
+    // Inherit table and columns for new components
     for (const comp of template.components) {
+      if (existingTable && (!comp.dataSource?.table || comp.dataSource.table.length === 0)) {
+        comp.dataSource = {
+          table: existingTable,
+          columns: existingColumns.length > 0 ? existingColumns : (comp.dataSource?.columns ?? []),
+        };
+      }
       addComponent(comp);
     }
   };

@@ -81,19 +81,19 @@ export function Toolbar() {
   };
 
   return (
-    <div className="flex h-auto min-h-12 shrink-0 flex-wrap items-center gap-2 border-b border-border bg-background px-3 py-2 sm:px-4 sm:py-0 sm:h-12 sm:flex-nowrap">
+    <div className="flex h-auto min-h-12 shrink-0 flex-wrap items-center gap-2 border-b border-teal-700 bg-teal-600 px-3 py-2 sm:px-4 sm:py-0 sm:h-12 sm:flex-nowrap">
       <div className="flex items-center gap-2 shrink-0">
-        <span className="text-sm font-semibold text-foreground truncate max-w-[120px] sm:max-w-none">
+        <span className="text-sm font-semibold text-white truncate max-w-[120px] sm:max-w-none">
           {dashboard?.name ?? 'Dashboard'}
         </span>
         {isSaving && (
-          <span className="text-xs text-muted-foreground">Saving...</span>
+          <span className="text-xs text-teal-100">Saving...</span>
         )}
         {!isSaving && isDirty && (
-          <span className="text-xs text-amber-600 font-medium">Unsaved changes</span>
+          <span className="text-xs text-amber-300 font-medium">Unsaved changes</span>
         )}
         {!isSaving && !isDirty && lastSavedAt && (
-          <span className="text-xs text-muted-foreground">
+          <span className="text-xs text-teal-100">
             Saved <RelativeTime date={lastSavedAt} />
           </span>
         )}
@@ -115,8 +115,8 @@ export function Toolbar() {
               className={cn(
                 'group flex shrink-0 items-center gap-1 rounded-md px-2.5 py-1 text-xs font-medium transition-colors',
                 page.id === activePageId
-                  ? 'bg-accent text-foreground'
-                  : 'text-muted-foreground hover:text-foreground hover:bg-accent/50',
+                  ? 'bg-teal-700 text-white'
+                  : 'text-teal-100 hover:text-white hover:bg-teal-700/50',
               )}
             >
               {editingPageId === page.id ? (
@@ -167,14 +167,14 @@ export function Toolbar() {
         {canScrollRight && (
           <button
             onClick={() => tabsRef.current?.scrollBy({ left: 120, behavior: 'smooth' })}
-            className="shrink-0 rounded p-0.5 text-muted-foreground hover:text-foreground"
+            className="shrink-0 rounded p-0.5 text-teal-100 hover:text-white"
           >
             <ChevronRight className="h-3.5 w-3.5" />
           </button>
         )}
         <button
           onClick={handleAddPage}
-          className="shrink-0 rounded-md p-1 text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+          className="shrink-0 rounded-md p-1 text-teal-100 transition-colors hover:bg-teal-700 hover:text-white"
           title="Add page"
         >
           <Plus className="h-3.5 w-3.5" />
@@ -187,6 +187,7 @@ export function Toolbar() {
           size="icon"
           onClick={() => setThemeEditorOpen(true)}
           title="Theme"
+          className="text-teal-100 hover:bg-teal-700 hover:text-white"
         >
           <Palette className="h-4 w-4" />
         </Button>
@@ -196,6 +197,7 @@ export function Toolbar() {
           onClick={undo}
           disabled={undoStack.length === 0}
           title="Undo"
+          className="text-teal-100 hover:bg-teal-700 hover:text-white disabled:text-teal-300/50"
         >
           <Undo2 className="h-4 w-4" />
         </Button>
@@ -205,6 +207,7 @@ export function Toolbar() {
           onClick={redo}
           disabled={redoStack.length === 0}
           title="Redo"
+          className="text-teal-100 hover:bg-teal-700 hover:text-white disabled:text-teal-300/50"
         >
           <Redo2 className="h-4 w-4" />
         </Button>
@@ -213,6 +216,7 @@ export function Toolbar() {
           size="icon"
           onClick={togglePreview}
           title={isPreview ? 'Edit mode' : 'Preview mode'}
+          className="text-teal-100 hover:bg-teal-700 hover:text-white"
         >
           {isPreview ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
         </Button>
@@ -220,7 +224,7 @@ export function Toolbar() {
           size="sm"
           onClick={save}
           disabled={!isDirty || isSaving}
-          className="gap-1.5"
+          className="gap-1.5 bg-white text-teal-700 hover:bg-teal-50 disabled:bg-teal-100 disabled:text-teal-400"
         >
           <Save className="h-3.5 w-3.5" />
           <span className="hidden sm:inline">{isSaving ? 'Saving' : 'Save'}</span>

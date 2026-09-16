@@ -40,8 +40,8 @@ type ProposalResult = {
 const GENERATION_TIMEOUT_MS = 5000;
 
 const DEFAULT_THEME: DashboardConfig["theme"] = {
-  primaryColor: "#6366f1",
-  chartPalette: ["#6366f1", "#8b5cf6", "#06b6d4", "#10b981", "#f59e0b", "#ef4444"],
+  primaryColor: "#0d9488",
+  chartPalette: ["#0d9488", "#14b8a6", "#06b6d4", "#22d3ee", "#f59e0b", "#ef4444"],
   fontSize: "md",
   borderRadius: 12,
 };

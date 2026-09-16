@@ -145,18 +145,18 @@ export function BuilderCanvas({ theme, dataMap = {}, loadingMap = {}, errorMap =
                 key={comp.id}
                 onClick={(e) => handleSelect(e, comp.id)}
                 className={cn(
-                  'overflow-hidden rounded-xl border bg-card transition-shadow',
+                  'overflow-hidden rounded-xl border bg-white transition-shadow',
                   selectedComponentId === comp.id && !isPreview
-                    ? 'border-primary ring-2 ring-primary/20'
-                    : 'border-border hover:border-muted-foreground/30',
+                    ? 'border-teal-500 ring-2 ring-teal-500/20'
+                    : 'border-slate-200 hover:border-slate-300',
                 )}
               >
                 {!isPreview && (
-                  <div className="drag-handle flex h-7 items-center justify-between border-b border-border bg-muted/40 px-2">
-                    <span className="text-[10px] font-medium text-muted-foreground uppercase tracking-wide">
+                  <div className="drag-handle flex h-7 items-center justify-between border-b border-slate-200 bg-slate-100 px-2">
+                    <span className="text-[10px] font-medium text-slate-600 uppercase tracking-wide">
                       {comp.type}
                     </span>
-                    <span className="text-[10px] text-muted-foreground/50">
+                    <span className="text-[10px] text-slate-400">
                       {comp.layout.w}x{comp.layout.h}
                     </span>
                   </div>

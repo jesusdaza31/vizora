@@ -48,7 +48,7 @@ const ALIGNMENTS = [
 
 function FieldLabel({ children }: { children: React.ReactNode }) {
   return (
-    <label className="mb-1 block text-[11px] font-medium text-muted-foreground uppercase tracking-wider">
+    <label className="block text-[11px] font-medium text-slate-600 uppercase tracking-wide">
       {children}
     </label>
   );
@@ -112,8 +112,8 @@ export function PropertyEditor() {
   if (!component) {
     return (
       <div className="flex h-full flex-col items-center justify-center gap-2 p-4 text-center">
-        <Settings2 className="h-8 w-8 text-muted-foreground/30" />
-        <p className="text-xs text-muted-foreground">Select a component to edit its properties</p>
+        <Settings2 className="h-8 w-8 text-slate-300" />
+        <p className="text-xs text-slate-500">Select a component to edit its properties</p>
       </div>
     );
   }
@@ -122,21 +122,21 @@ export function PropertyEditor() {
 
   const editorContent = (
     <>
-      <div className="flex items-center justify-between border-b border-border px-4 py-2.5">
-        <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+      <div className="flex items-center justify-between border-b border-slate-200 px-4 py-2.5">
+        <h3 className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
           Properties
         </h3>
         <div className="flex items-center gap-1">
           <button
             onClick={() => removeComponent(component.id)}
-            className="rounded-md p-1.5 text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive"
+            className="rounded-md p-1.5 text-slate-500 transition-colors hover:bg-red-50 hover:text-red-600"
             title="Delete component"
           >
             <Trash2 className="h-3.5 w-3.5" />
           </button>
           <button
             onClick={() => setMobileExpanded(false)}
-            className="rounded-md p-1.5 text-muted-foreground transition-colors hover:bg-accent md:hidden"
+            className="rounded-md p-1.5 text-slate-500 transition-colors hover:bg-slate-100 md:hidden"
           >
             <X className="h-3.5 w-3.5" />
           </button>
@@ -146,7 +146,7 @@ export function PropertyEditor() {
       <div className="flex flex-col gap-4 p-4">
         <div>
           <FieldLabel>Widget Type</FieldLabel>
-          <div className="rounded-md bg-muted px-3 py-1.5 text-sm capitalize text-foreground">
+          <div className="rounded-md bg-slate-100 px-3 py-1.5 text-sm capitalize text-slate-900">
             {component.type}
           </div>
         </div>

@@ -1,175 +1,99 @@
 'use client';
 
-import { useState, useCallback } from 'react';
-import {
-  Table,
-  TableHeader,
-  TableBody,
-  TableRow,
-  TableHead,
-  TableCell,
-} from '@/components/ui/table';
-import { Card, CardContent } from '@/components/ui/card';
+import { useState } from 'react';
 import { cn } from '@/lib/utils';
-import { ChevronUp, ChevronDown, ChevronsUpDown } from 'lucide-react';
 import type { WidgetProps } from '@/lib/vizora/widget-registry';
+import { ChevronUp, ChevronDown } from 'lucide-react';
 
-type SortDirection = 'ASC' | 'DESC' | null;
-type SortState = { column: string; direction: SortDirection };
+type SortDirection = 'asc' | 'desc' | null;
 
-type DataTableProps = WidgetProps & {
-  totalCount?: number;
-  page?: number;
-  pageSize?: number;
-  onPageChange?: (page: number) => void;
-  onSort?: (sort: SortState) => void;
-};
+export default function DataTable({ config, data, theme, isLoading }: WidgetProps) {
+  const [sortColumn, setSortColumn] = useState<string | null>(null);
+  const [sortDirection, setSortDirection] = useState<SortDirection>(null);
 
-function SortIcon({ direction }: { direction: SortDirection }) {
-  if (direction === 'ASC') return <ChevronUp className="h-3.5 w-3.5" />;
-  if (direction === 'DESC') return <ChevronDown className="h-3.5 w-3.5" />;
-  return <ChevronsUpDown className="h-3.5 w-3.5 opacity-40" />;
-}
-
-export default function DataTable({
-  config,
-  data,
-  theme,
-  isLoading,
-  totalCount: externalTotal,
-  page: externalPage,
-  pageSize: externalPageSize,
-  onPageChange,
-  onSort,
-}: DataTableProps) {
-  const columns = config.dataSource.columns;
-  const options = config.options as { title?: string };
+  const options = config.options as { pageSize?: number; sortable?: boolean; title?: string };
   const title = options.title ?? '';
-
-  const [internalSort, setInternalSort] = useState<SortState>({ column: '', direction: null });
-  const [internalPage, setInternalPage] = useState(0);
-
-  const isControlled = externalPage !== undefined && onPageChange !== undefined;
-  const currentPage = isControlled ? externalPage : internalPage;
-  const total = externalTotal ?? data?.totalCount ?? 0;
-  const pageSize = externalPageSize ?? data?.pageSize ?? 10;
-  const totalPages = Math.max(1, Math.ceil(total / pageSize));
-
-  const rows = data?.data ?? [];
-
-  const handleSort = useCallback(
-    (column: string) => {
-      const next: SortState =
-        internalSort.column === column
-          ? internalSort.direction === 'ASC'
-            ? { column, direction: 'DESC' }
-            : internalSort.direction === 'DESC'
-              ? { column: '', direction: null }
-              : { column, direction: 'ASC' }
-          : { column, direction: 'ASC' };
-
-      if (!isControlled) setInternalSort(next);
-      onSort?.(next);
-    },
-    [internalSort, isControlled, onSort],
-  );
-
-  const handlePageChange = useCallback(
-    (page: number) => {
-      if (!isControlled) setInternalPage(page);
-      onPageChange?.(page);
-    },
-    [isControlled, onPageChange],
-  );
 
   if (isLoading) {
     return (
-      <Card style={{ borderRadius: theme.borderRadius }}>
-        <CardContent className="flex h-full min-h-[200px] items-center justify-center">
-          <div className="h-8 w-8 animate-spin rounded-full border-2 border-muted-foreground/30 border-t-muted-foreground" />
-        </CardContent>
-      </Card>
+      <div className="flex h-full items-center justify-center rounded-xl border border-slate-200 bg-white p-6">
+        <div className="h-8 w-8 animate-spin rounded-full border-2 border-slate-200 border-t-teal-600" />
+      </div>
     );
   }
 
-  return (
-    <Card style={{ borderRadius: theme.borderRadius }} className="h-full">
-      <CardContent className="h-full p-4">
-        {title && <p className="mb-3 text-sm font-medium text-foreground">{title}</p>}
-        <div className="overflow-x-auto">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                {columns.map((col) => (
-                  <TableHead key={col}>
-                    <button
-                      type="button"
-                      className="flex items-center gap-1 text-left font-medium"
-                      onClick={() => handleSort(col)}
-                    >
-                      <span className="capitalize">{col}</span>
-                      <SortIcon
-                        direction={internalSort.column === col ? internalSort.direction : null}
-                      />
-                    </button>
-                  </TableHead>
-                ))}
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {rows.length === 0 ? (
-                <TableRow>
-                  <TableCell colSpan={columns.length} className="py-8 text-center text-muted-foreground">
-                    No data available
-                  </TableCell>
-                </TableRow>
-              ) : (
-                rows.map((row, i) => (
-                  <TableRow key={i}>
-                    {columns.map((col) => (
-                      <TableCell key={col}>
-                        {row[col] !== null && row[col] !== undefined ? String(row[col]) : '—'}
-                      </TableCell>
-                    ))}
-                  </TableRow>
-                ))
-              )}
-            </TableBody>
-          </Table>
-        </div>
+  const rows = data?.data ?? [];
+  const columns = config.dataSource.columns;
 
-        {totalPages > 1 && (
-          <div className="mt-4 flex items-center justify-between border-t border-border pt-3">
-            <p className="text-xs text-muted-foreground">
-              Page {currentPage + 1} of {totalPages}
-            </p>
-            <div className="flex items-center gap-2">
-              <button
-                type="button"
-                disabled={currentPage === 0}
-                onClick={() => handlePageChange(currentPage - 1)}
-                className={cn(
-                  'rounded-lg px-3 py-1.5 text-xs font-medium transition-colors',
-                  'border border-border hover:bg-accent disabled:opacity-40 disabled:hover:bg-transparent',
-                )}
-              >
-                Previous
-              </button>
-              <button
-                type="button"
-                disabled={currentPage >= totalPages - 1}
-                onClick={() => handlePageChange(currentPage + 1)}
-                className={cn(
-                  'rounded-lg px-3 py-1.5 text-xs font-medium transition-colors',
-                  'border border-border hover:bg-accent disabled:opacity-40 disabled:hover:bg-transparent',
-                )}
-              >
-                Next
-              </button>
-            </div>
-          </div>
-        )}
-      </CardContent>
-    </Card>
+  if (rows.length === 0) {
+    return (
+      <div className="flex h-full items-center justify-center rounded-xl border border-slate-200 bg-white p-6">
+        <p className="text-sm text-slate-500">No data available</p>
+      </div>
+    );
+  }
+
+  const handleSort = (column: string) => {
+    if (sortColumn === column) {
+      setSortDirection(sortDirection === 'asc' ? 'desc' : sortDirection === 'desc' ? null : 'asc');
+      if (sortDirection === 'desc') setSortColumn(null);
+    } else {
+      setSortColumn(column);
+      setSortDirection('asc');
+    }
+  };
+
+  const sortedRows = [...rows].sort((a, b) => {
+    if (!sortColumn || !sortDirection) return 0;
+    const aVal = a[sortColumn];
+    const bVal = b[sortColumn];
+    const modifier = sortDirection === 'asc' ? 1 : -1;
+    if (typeof aVal === 'number' && typeof bVal === 'number') {
+      return (aVal - bVal) * modifier;
+    }
+    return String(aVal).localeCompare(String(bVal)) * modifier;
+  });
+
+  return (
+    <div className="flex h-full flex-col rounded-xl border border-slate-200 bg-white shadow-sm">
+      {title && (
+        <div className="border-b border-slate-200 px-5 py-3">
+          <h3 className="text-sm font-semibold text-slate-900">{title}</h3>
+        </div>
+      )}
+      <div className="flex-1 overflow-auto">
+        <table className="w-full">
+          <thead className="sticky top-0 bg-teal-600">
+            <tr>
+              {columns.map((col) => (
+                <th
+                  key={col}
+                  onClick={() => handleSort(col)}
+                  className="cursor-pointer px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-white hover:bg-teal-700"
+                >
+                  <div className="flex items-center gap-1">
+                    {col}
+                    {sortColumn === col && (
+                      sortDirection === 'asc' ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />
+                    )}
+                  </div>
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-slate-100">
+            {sortedRows.map((row, idx) => (
+              <tr key={idx} className="hover:bg-slate-50">
+                {columns.map((col) => (
+                  <td key={col} className="px-4 py-3 text-sm text-slate-700">
+                    {String(row[col] ?? '')}
+                  </td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
   );
 }

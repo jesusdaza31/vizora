@@ -1,9 +1,8 @@
 'use client';
 
-import { Card, CardContent } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
 import type { WidgetProps } from '@/lib/vizora/widget-registry';
-import { TrendingUp, TrendingDown } from 'lucide-react';
+import { TrendingUp, TrendingDown, Minus } from 'lucide-react';
 
 type Format = 'number' | 'currency' | 'percentage';
 
@@ -31,37 +30,45 @@ export default function KpiCard({ config, data, theme, isLoading }: WidgetProps)
 
   if (isLoading) {
     return (
-      <Card style={{ borderRadius: theme.borderRadius }}>
-        <CardContent className="flex h-full items-center justify-center p-6">
-          <div className="h-8 w-8 animate-spin rounded-full border-2 border-muted-foreground/30 border-t-muted-foreground" />
-        </CardContent>
-      </Card>
+      <div className="flex h-full items-center justify-center rounded-xl border border-slate-200 bg-white p-6">
+        <div className="h-8 w-8 animate-spin rounded-full border-2 border-slate-200 border-t-teal-600" />
+      </div>
     );
   }
 
   return (
-    <Card style={{ borderRadius: theme.borderRadius }}>
-      <CardContent className="flex h-full flex-col justify-center gap-2 p-6">
-        {title && <p className="mb-1 text-sm font-medium text-foreground">{title}</p>}
-        <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">{label}</p>
-        <p
-          className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl"
-          style={{ color: theme.primaryColor }}
-        >
+    <div className="flex h-full flex-col rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+      <div className="mb-3 flex items-center gap-3">
+        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-teal-50">
+          <div className="h-5 w-5 rounded-full bg-teal-500" />
+        </div>
+        {title && <p className="text-sm font-medium text-slate-700">{title}</p>}
+      </div>
+      
+      <div className="flex flex-1 flex-col justify-center">
+        <p className="text-3xl font-bold tracking-tight text-slate-900">
           {formatValue(value, format)}
         </p>
-        {trend && trend !== 'neutral' && trendValue && (
-          <div
-            className={cn(
-              'flex items-center gap-1 text-xs font-medium',
-              trend === 'up' ? 'text-emerald-600' : 'text-red-500',
-            )}
-          >
-            {trend === 'up' ? <TrendingUp className="h-3.5 w-3.5" /> : <TrendingDown className="h-3.5 w-3.5" />}
-            <span>{trendValue}</span>
-          </div>
-        )}
-      </CardContent>
-    </Card>
+        <p className="mt-1 text-xs font-medium uppercase tracking-wide text-slate-500">
+          {label}
+        </p>
+      </div>
+
+      {trend && trend !== 'neutral' && trendValue && (
+        <div className="mt-3 flex items-center gap-1.5">
+          {trend === 'up' ? (
+            <TrendingUp className="h-4 w-4 text-emerald-600" />
+          ) : (
+            <TrendingDown className="h-4 w-4 text-red-500" />
+          )}
+          <span className={cn(
+            'text-sm font-semibold',
+            trend === 'up' ? 'text-emerald-600' : 'text-red-500'
+          )}>
+            {trendValue}
+          </span>
+        </div>
+      )}
+    </div>
   );
 }

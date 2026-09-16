@@ -75,7 +75,7 @@ export function ComponentPanel() {
   };
 
   const handleApplyTemplate = (name: TemplateName) => {
-    if (!dashboard || !activePageId) return;
+    if (!dashboard || !activePageId || !activePage) return;
     const template = applyTemplate(name);
     
     // Find existing table and columns from current components to inherit
@@ -103,28 +103,28 @@ export function ComponentPanel() {
       <button
         key={def.type}
         onClick={() => handleAddWidget(def.type)}
-        className="flex items-center gap-2.5 rounded-lg border border-border bg-background px-3 py-2 text-left transition-colors hover:border-primary/40 hover:bg-accent md:gap-2 md:px-2"
+        className="flex items-center gap-2.5 rounded-lg border border-slate-200 bg-white px-3 py-2 text-left transition-colors hover:border-teal-400 hover:bg-teal-50 md:gap-2 md:px-2"
       >
-        <Icon className="h-4 w-4 shrink-0 text-muted-foreground" />
-        <span className="text-sm text-foreground md:hidden lg:inline">{def.label}</span>
-        <Plus className="ml-auto h-3.5 w-3.5 text-muted-foreground/50 md:hidden lg:inline" />
+        <Icon className="h-4 w-4 shrink-0 text-slate-500" />
+        <span className="text-sm text-slate-700 md:hidden lg:inline">{def.label}</span>
+        <Plus className="ml-auto h-3.5 w-3.5 text-slate-400 md:hidden lg:inline" />
       </button>
     );
   };
 
   return (
     <div className="flex h-full flex-col overflow-y-auto">
-      <div className="border-b border-border px-4 py-2.5 md:px-2">
-        <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider md:hidden lg:block">
+      <div className="border-b border-slate-200 px-4 py-2.5 md:px-2">
+        <h3 className="text-xs font-semibold text-slate-500 uppercase tracking-wider md:hidden lg:block">
           Components
         </h3>
-        <LayoutGrid className="mx-auto h-4 w-4 text-muted-foreground md:block lg:hidden" />
+        <LayoutGrid className="mx-auto h-4 w-4 text-slate-500 md:block lg:hidden" />
       </div>
 
       <div className="flex flex-col gap-1 p-3 md:p-1.5">
         <button
           onClick={() => setTemplatesOpen(!templatesOpen)}
-          className="flex items-center gap-1.5 rounded-md px-1 py-1 text-xs font-medium text-muted-foreground hover:text-foreground"
+          className="flex items-center gap-1.5 rounded-md px-1 py-1 text-xs font-medium text-slate-600 hover:text-slate-900"
         >
           {templatesOpen ? <ChevronDown className="h-3.5 w-3.5" /> : <ChevronRight className="h-3.5 w-3.5" />}
           <LayoutGrid className="h-3.5 w-3.5" />
@@ -140,12 +140,12 @@ export function ComponentPanel() {
                   className={cn(
                     'rounded-md px-2 py-1.5 text-left transition-colors',
                     key === 'custom'
-                      ? 'text-xs text-muted-foreground hover:text-foreground'
-                      : 'hover:bg-accent',
+                      ? 'text-xs text-slate-500 hover:text-slate-700'
+                      : 'hover:bg-slate-100',
                   )}
                 >
-                  <div className="text-xs font-medium text-foreground">{tmpl.name}</div>
-                  <div className="text-[10px] text-muted-foreground">{tmpl.description}</div>
+                  <div className="text-xs font-medium text-slate-900">{tmpl.name}</div>
+                  <div className="text-[10px] text-slate-500">{tmpl.description}</div>
                 </button>
               ),
             )}
@@ -156,7 +156,7 @@ export function ComponentPanel() {
       <div className="flex flex-col gap-1 px-3 pb-3 md:px-1.5 md:pb-1.5">
         <button
           onClick={() => setWidgetsOpen(!widgetsOpen)}
-          className="flex items-center gap-1.5 rounded-md px-1 py-1 text-xs font-medium text-muted-foreground hover:text-foreground"
+          className="flex items-center gap-1.5 rounded-md px-1 py-1 text-xs font-medium text-slate-600 hover:text-slate-900"
         >
           {widgetsOpen ? <ChevronDown className="h-3.5 w-3.5" /> : <ChevronRight className="h-3.5 w-3.5" />}
           <span className="md:hidden lg:inline">Widgets</span>
@@ -164,7 +164,7 @@ export function ComponentPanel() {
         {widgetsOpen && (
           <div className="ml-4 flex flex-col gap-3 md:ml-0 md:gap-2 lg:ml-4 lg:gap-3">
             <div>
-              <p className="mb-1.5 text-[10px] font-medium text-muted-foreground uppercase tracking-wider md:hidden lg:block">
+              <p className="mb-1.5 text-[10px] font-medium text-slate-500 uppercase tracking-wider md:hidden lg:block">
                 Charts
               </p>
               <div className="flex flex-col gap-1">
@@ -172,7 +172,7 @@ export function ComponentPanel() {
               </div>
             </div>
             <div>
-              <p className="mb-1.5 text-[10px] font-medium text-muted-foreground uppercase tracking-wider md:hidden lg:block">
+              <p className="mb-1.5 text-[10px] font-medium text-slate-500 uppercase tracking-wider md:hidden lg:block">
                 Data
               </p>
               <div className="flex flex-col gap-1">
@@ -180,7 +180,7 @@ export function ComponentPanel() {
               </div>
             </div>
             <div>
-              <p className="mb-1.5 text-[10px] font-medium text-muted-foreground uppercase tracking-wider md:hidden lg:block">
+              <p className="mb-1.5 text-[10px] font-medium text-slate-500 uppercase tracking-wider md:hidden lg:block">
                 Content
               </p>
               <div className="flex flex-col gap-1">

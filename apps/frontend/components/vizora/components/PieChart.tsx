@@ -5,81 +5,68 @@ import {
   Pie,
   Cell,
   Tooltip,
-  Legend,
   ResponsiveContainer,
-  type PieLabelRenderProps,
+  Legend,
 } from 'recharts';
-import { Card, CardContent } from '@/components/ui/card';
 import type { WidgetProps } from '@/lib/vizora/widget-registry';
 
 export default function PieChart({ config, data, theme, isLoading }: WidgetProps) {
-  const options = config.options as {
-    nameKey?: string;
-    valueKey?: string;
-    donut?: boolean;
-    title?: string;
-    showLabels?: boolean;
-  };
-
-  const nameKey = options.nameKey ?? config.dataSource.columns[0] ?? 'name';
-  const valueKey = options.valueKey ?? config.dataSource.columns[1] ?? 'value';
-  const isDonut = options.donut ?? false;
+  const options = config.options as { nameKey?: string; valueKey?: string; donut?: boolean; showLabels?: boolean; title?: string };
   const title = options.title ?? '';
-  const showLabels = options.showLabels ?? true;
-  const palette = theme.chartPalette;
 
   if (isLoading) {
     return (
-      <Card style={{ borderRadius: theme.borderRadius }}>
-        <CardContent className="flex h-full min-h-[200px] items-center justify-center">
-          <div className="h-8 w-8 animate-spin rounded-full border-2 border-muted-foreground/30 border-t-muted-foreground" />
-        </CardContent>
-      </Card>
+      <div className="flex h-full items-center justify-center rounded-xl border border-slate-200 bg-white p-6">
+        <div className="h-8 w-8 animate-spin rounded-full border-2 border-slate-200 border-t-teal-600" />
+      </div>
     );
   }
 
   const chartData = data?.data ?? [];
+  const nameKey = options.nameKey ?? config.dataSource.columns[0] ?? 'name';
+  const valueKey = options.valueKey ?? config.dataSource.columns[1] ?? 'value';
 
-  const renderLabel = showLabels
-    ? (props: PieLabelRenderProps) => {
-        if (props.percent === undefined) return null;
-        return `${props.name ?? ''} ${(props.percent * 100).toFixed(0)}%`;
-      }
-    : undefined;
+  if (chartData.length === 0) {
+    return (
+      <div className="flex h-full items-center justify-center rounded-xl border border-slate-200 bg-white p-6">
+        <p className="text-sm text-slate-500">No data available</p>
+      </div>
+    );
+  }
 
   return (
-    <Card style={{ borderRadius: theme.borderRadius }} className="h-full">
-      <CardContent className="h-full p-4">
-        {title && <p className="mb-2 text-sm font-medium text-foreground">{title}</p>}
-        <ResponsiveContainer width="100%" height="100%" minHeight={200}>
+    <div className="flex h-full flex-col rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+      {title && <h3 className="mb-4 text-sm font-semibold text-slate-900">{title}</h3>}
+      <div className="flex-1">
+        <ResponsiveContainer width="100%" height="100%">
           <RechartsPieChart>
             <Pie
               data={chartData}
-              dataKey={valueKey}
-              nameKey={nameKey}
               cx="50%"
               cy="50%"
-              innerRadius={isDonut ? '45%' : 0}
+              innerRadius={options.donut ? '50%' : 0}
               outerRadius="80%"
               paddingAngle={2}
-              label={renderLabel}
+              dataKey={valueKey}
+              nameKey={nameKey}
+              label={options.showLabels ? (({ name, percent }) => `${name}: ${((percent ?? 0) * 100).toFixed(0)}%`) : undefined}
             >
-              {chartData.map((_, index) => (
-                <Cell key={`cell-${index}`} fill={palette[index % palette.length]} />
+              {chartData.map((_, idx) => (
+                <Cell key={`cell-${idx}`} fill={theme.chartPalette[idx % theme.chartPalette.length]} />
               ))}
             </Pie>
             <Tooltip
               contentStyle={{
-                backgroundColor: 'var(--color-card)',
-                border: '1px solid var(--color-border)',
-                borderRadius: theme.borderRadius,
-                fontSize: 12,
+                backgroundColor: '#ffffff',
+                border: '1px solid #e2e8f0',
+                borderRadius: '8px',
+                fontSize: '12px',
               }}
             />
-            <Legend wrapperStyle={{ fontSize: 12 }} />
+            <Legend wrapperStyle={{ fontSize: '11px' }} />
           </RechartsPieChart>
         </ResponsiveContainer>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 }

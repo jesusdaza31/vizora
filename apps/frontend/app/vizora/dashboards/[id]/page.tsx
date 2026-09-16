@@ -17,10 +17,10 @@ import { ThemeProvider } from '@/components/vizora/builder/ThemeProvider';
 import { BuilderCanvasSkeleton } from '@/components/vizora/skeletons/BuilderCanvasSkeleton';
 
 const DEFAULT_THEME = {
-  primaryColor: '#6366f1',
-  chartPalette: ['#6366f1', '#8b5cf6', '#06b6d4', '#10b981', '#f59e0b', '#ef4444'],
+  primaryColor: '#0d9488',
+  chartPalette: ['#0d9488', '#14b8a6', '#06b6d4', '#22d3ee', '#f59e0b', '#ef4444'],
   fontSize: 'md' as const,
-  borderRadius: 8 as const,
+  borderRadius: 12 as const,
 };
 
 export default function DashboardEditorPage({
@@ -194,7 +194,7 @@ export default function DashboardEditorPage({
             <ComponentPanel />
           </aside>
 
-          <main className="flex flex-1 flex-col overflow-hidden bg-muted/20">
+          <main className="flex flex-1 flex-col overflow-hidden bg-slate-50">
             <BuilderCanvas
               theme={dashboard?.config.theme ?? DEFAULT_THEME}
               dataMap={dataMap}

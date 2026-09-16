@@ -1,9 +1,9 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { searchTables } from '@/lib/vizora/dashboard-api';
 import { cn } from '@/lib/utils';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Search } from 'lucide-react';
 
 type TableComboboxProps = {
   value: string;
@@ -12,15 +12,19 @@ type TableComboboxProps = {
 
 export function TableCombobox({ value, onChange }: TableComboboxProps) {
   const [tables, setTables] = useState<Array<{ tableName: string }>>([]);
+  const [filteredTables, setFilteredTables] = useState<Array<{ tableName: string }>>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
+  const [search, setSearch] = useState('');
+  const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (isOpen && tables.length === 0) {
       setIsLoading(true);
-      searchTables('', 100, 0)
+      searchTables('', 500, 0)
         .then((result) => {
           setTables(result.tables ?? []);
+          setFilteredTables(result.tables ?? []);
         })
         .catch((err) => {
           console.error('Failed to load tables:', err);
@@ -30,6 +34,21 @@ export function TableCombobox({ value, onChange }: TableComboboxProps) {
         });
     }
   }, [isOpen, tables.length]);
+
+  useEffect(() => {
+    if (search) {
+      const lower = search.toLowerCase();
+      setFilteredTables(tables.filter((t) => t.tableName.toLowerCase().includes(lower)));
+    } else {
+      setFilteredTables(tables);
+    }
+  }, [search, tables]);
+
+  useEffect(() => {
+    if (isOpen && inputRef.current) {
+      inputRef.current.focus();
+    }
+  }, [isOpen]);
 
   return (
     <div className="relative">
@@ -51,21 +70,37 @@ export function TableCombobox({ value, onChange }: TableComboboxProps) {
 
       {isOpen && (
         <div className="absolute z-50 mt-1 w-full rounded-md border border-slate-200 bg-white shadow-lg">
+          <div className="border-b border-slate-200 p-2">
+            <div className="relative">
+              <Search className="absolute left-2 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-slate-400" />
+              <input
+                ref={inputRef}
+                type="text"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder="Search tables..."
+                className="w-full rounded-md border border-slate-200 bg-white py-1.5 pl-7 pr-2 text-xs text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-1 focus:ring-teal-500"
+              />
+            </div>
+          </div>
           <div className="max-h-[200px] overflow-y-auto p-1">
             {isLoading ? (
               <div className="flex items-center justify-center py-4">
                 <Loader2 className="h-4 w-4 animate-spin text-slate-400" />
               </div>
-            ) : tables.length === 0 ? (
-              <p className="py-4 text-center text-xs text-slate-500">No tables found</p>
+            ) : filteredTables.length === 0 ? (
+              <p className="py-4 text-center text-xs text-slate-500">
+                {search ? `No tables match "${search}"` : 'No tables found'}
+              </p>
             ) : (
-              tables.map((t) => (
+              filteredTables.map((t) => (
                 <button
                   key={t.tableName}
                   type="button"
                   onClick={() => {
                     onChange(t.tableName);
                     setIsOpen(false);
+                    setSearch('');
                   }}
                   className={cn(
                     'flex w-full items-center rounded-sm px-2 py-1.5 text-xs transition-colors',

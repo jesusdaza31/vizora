@@ -9,8 +9,10 @@ import {
   LazyPieChart,
   LazyDataTable,
   LazyTextBlock,
-  LazyFilterControl,
 } from '@/lib/vizora/widget-registry';
+import { FilterControlAdapter } from './FilterControlAdapter';
+import { useBuilderStore } from '@/store/vizora-builder-store';
+import type { FilterValue } from '../components/FilterControl';
 
 type WidgetRegistryProps = {
   config: ComponentConfig;
@@ -59,13 +61,33 @@ const widgetMap = {
   pie: LazyPieChart,
   table: LazyDataTable,
   text: LazyTextBlock,
-  filter: LazyFilterControl,
 } as const;
+
+function FilterWidgetWrapper({ config, theme }: { config: ComponentConfig; theme: ThemeConfig }) {
+  const filterValues = useBuilderStore((s) => s.filterValues);
+  const setFilterValue = useBuilderStore((s) => s.setFilterValue);
+
+  const filterValue = (filterValues[config.id] ?? '') as FilterValue;
+  const handleChange = (value: FilterValue) => {
+    setFilterValue(config.id, value);
+  };
+
+  return <FilterControlAdapter component={config} filterValue={filterValue} onChange={handleChange} />;
+}
 
 export function WidgetRegistry({ config, data, theme, isLoading = false, error = null }: WidgetRegistryProps) {
   if (error) return <WidgetError message={error} />;
 
-  const Component = widgetMap[config.type];
+  // Special handling for filter widgets
+  if (config.type === 'filter') {
+    return (
+      <Suspense fallback={<WidgetFallback />}>
+        <FilterWidgetWrapper config={config} theme={theme} />
+      </Suspense>
+    );
+  }
+
+  const Component = widgetMap[config.type as keyof typeof widgetMap];
   if (!Component) return <WidgetNotFound type={config.type} />;
 
   const hasData = data && data.data && data.data.length > 0;

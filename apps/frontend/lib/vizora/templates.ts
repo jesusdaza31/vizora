@@ -64,9 +64,9 @@ export function applyTemplate(templateName: TemplateName): PageConfig {
           createComponent('kpi', 3, 0, 3, 2, { label: 'KPI 2', format: 'currency' }),
           createComponent('kpi', 6, 0, 3, 2, { label: 'KPI 3', format: 'percentage' }),
           createComponent('kpi', 9, 0, 3, 2, { label: 'KPI 4', format: 'number' }),
-          createComponent('bar', 0, 2, 6, 4, { stacked: false }),
-          createComponent('line', 6, 2, 6, 4, { grouped: false }),
-          createComponent('table', 0, 6, 12, 4, { pageSize: 10, sortable: true }),
+          createComponent('bar', 0, 2, 6, 4, {}),
+          createComponent('line', 6, 2, 6, 4, {}),
+          createComponent('table', 0, 6, 12, 4, {}),
         ],
       };
 
@@ -75,10 +75,18 @@ export function applyTemplate(templateName: TemplateName): PageConfig {
         id: pageId,
         name: 'Analytical Dashboard',
         components: [
-          createComponent('filter', 0, 0, 12, 1, { label: 'Filters' }),
-          createComponent('bar', 0, 1, 6, 4, { stacked: false }),
-          createComponent('line', 6, 1, 6, 4, { grouped: false }),
-          createComponent('table', 0, 5, 12, 4, { pageSize: 15, sortable: true }),
+          createComponent('filter', 0, 0, 12, 1, {
+            label: 'Filters',
+            filterConfig: {
+              column: '',
+              vizoraType: 'string',
+              operator: '$in',
+              label: 'Filter',
+            },
+          }),
+          createComponent('bar', 0, 1, 6, 4, {}),
+          createComponent('line', 6, 1, 6, 4, {}),
+          createComponent('table', 0, 5, 12, 4, {}),
         ],
       };
 
@@ -87,11 +95,11 @@ export function applyTemplate(templateName: TemplateName): PageConfig {
         id: pageId,
         name: 'Comparative Dashboard',
         components: [
-          createComponent('bar', 0, 0, 6, 5, { stacked: false, label: 'Dataset A' }),
-          createComponent('line', 6, 0, 6, 5, { grouped: false, label: 'Dataset B' }),
+          createComponent('bar', 0, 0, 6, 5, { label: 'Dataset A' }),
+          createComponent('line', 6, 0, 6, 5, { label: 'Dataset B' }),
           createComponent('pie', 0, 5, 4, 4, {}),
           createComponent('kpi', 4, 5, 4, 4, { label: 'Comparison', format: 'number' }),
-          createComponent('table', 8, 5, 4, 4, { pageSize: 10, sortable: true }),
+          createComponent('table', 8, 5, 4, 4, {}),
         ],
       };
 
@@ -101,8 +109,8 @@ export function applyTemplate(templateName: TemplateName): PageConfig {
         name: 'Detailed Dashboard',
         components: [
           createComponent('kpi', 0, 0, 4, 2, { label: 'Summary', format: 'number' }),
-          createComponent('table', 0, 2, 12, 4, { pageSize: 20, sortable: true }),
-          createComponent('table', 0, 6, 12, 4, { pageSize: 20, sortable: true }),
+          createComponent('table', 0, 2, 12, 4, {}),
+          createComponent('table', 0, 6, 12, 4, {}),
         ],
       };
 

@@ -35,7 +35,7 @@ export class QueryBuilder {
 
     const selectClause = this.buildSelectClause(request);
     parts.push(`SELECT ${selectClause}`);
-    parts.push(`FROM [dbo].${this.escapeIdentifier(request.table)}`);
+    parts.push(`FROM ${this.buildFromClause(request.table)}`);
 
     const { clause, filterParams, nextIndex } = this.buildFilterClause(request.filters);
     if (clause) parts.push(`WHERE ${clause}`);
@@ -67,7 +67,7 @@ export class QueryBuilder {
     if (hasAggregation) {
       const selectClause = this.buildSelectClause(request);
       parts.push(`SELECT COUNT(*) AS totalCount FROM (SELECT ${selectClause}`);
-      parts.push(`FROM [dbo].${this.escapeIdentifier(request.table)}`);
+      parts.push(`FROM ${this.buildFromClause(request.table)}`);
 
       const { clause, filterParams } = this.buildFilterClause(request.filters);
       if (clause) parts.push(`WHERE ${clause}`);
@@ -79,7 +79,7 @@ export class QueryBuilder {
       parts.push(`) AS __counted`);
     } else {
       parts.push(`SELECT COUNT(*) AS totalCount`);
-      parts.push(`FROM [dbo].${this.escapeIdentifier(request.table)}`);
+      parts.push(`FROM ${this.buildFromClause(request.table)}`);
 
       const { clause, filterParams } = this.buildFilterClause(request.filters);
       if (clause) parts.push(`WHERE ${clause}`);
@@ -180,6 +180,15 @@ export class QueryBuilder {
       return `${this.escapeIdentifier(request.orderBy.column)} ${dir}`;
     }
     return `(SELECT NULL)`;
+  }
+
+  private buildFromClause(table: string): string {
+    // Handle qualified table names like "dbo.TableName" or just "TableName"
+    const parts = table.split(".");
+    if (parts.length === 2) {
+      return `[${parts[0].replace(/[\]]/g, "")}].[${parts[1].replace(/[\]]/g, "")}]`;
+    }
+    return `[dbo].${this.escapeIdentifier(table)}`;
   }
 
   private escapeIdentifier(name: string): string {
